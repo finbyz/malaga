@@ -1,0 +1,230 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "SELSHEET.#####",
+ "creation": "2023-02-20 19:27:54.571079",
+ "default_view": "List",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "section_break_o8kys",
+  "date",
+  "quotation",
+  "start_date",
+  "column_break_rpjhd",
+  "customer_name",
+  "customer_reference_comment",
+  "column_break_tus8h",
+  "site_address",
+  "customer_reference",
+  "section_break_aolzu",
+  "client_name",
+  "column_break_q777r",
+  "client_site_address",
+  "column_break_eduii",
+  "client_contact",
+  "section_break_r9btm",
+  "customer_price_list",
+  "column_break_jdu7a",
+  "end_client_price_list",
+  "company",
+  "section_break_7",
+  "product",
+  "section_break_4uss5",
+  "column_break_qegtd",
+  "total",
+  "column_break_cqwiv",
+  "grand_total_client"
+ ],
+ "fields": [
+  {
+   "fieldname": "customer_name",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Customer Name",
+   "options": "Customer",
+   "reqd": 1
+  },
+  {
+   "default": "0",
+   "fetch_if_empty": 1,
+   "fieldname": "customer_reference",
+   "fieldtype": "Check",
+   "in_list_view": 1,
+   "label": "Builder Reference"
+  },
+  {
+   "fieldname": "start_date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "Start Date"
+  },
+  {
+   "fieldname": "section_break_7",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fetch_from": "customer_name.customer_primary_address",
+   "fetch_if_empty": 1,
+   "fieldname": "site_address",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Customer Address",
+   "options": "Address"
+  },
+  {
+   "fieldname": "section_break_4uss5",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "total",
+   "fieldtype": "Currency",
+   "label": "Grand Total",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_qegtd",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "section_break_r9btm",
+   "fieldtype": "Section Break"
+  },
+  {
+   "default": "Malaga Tile Centre",
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "hidden": 1,
+   "label": "Company",
+   "options": "Company"
+  },
+  {
+   "default": "Today",
+   "fieldname": "date",
+   "fieldtype": "Date",
+   "label": "Date",
+   "reqd": 1
+  },
+  {
+   "fieldname": "quotation",
+   "fieldtype": "Link",
+   "label": "Quotation",
+   "options": "Quotation",
+   "read_only": 1
+  },
+  {
+   "fieldname": "product",
+   "fieldtype": "Table",
+   "options": "Selection Sheet Product",
+   "reqd": 1
+  },
+  {
+   "fetch_from": "customer_name.default_price_list",
+   "fieldname": "customer_price_list",
+   "fieldtype": "Link",
+   "label": "Customer Price List",
+   "options": "Price List"
+  },
+  {
+   "depends_on": "customer_reference",
+   "fetch_from": "client_name.default_price_list",
+   "fieldname": "end_client_price_list",
+   "fieldtype": "Link",
+   "label": "End Client Price List",
+   "options": "Price List"
+  },
+  {
+   "depends_on": "customer_reference",
+   "fieldname": "client_name",
+   "fieldtype": "Link",
+   "label": "Client Name",
+   "options": "Customer"
+  },
+  {
+   "depends_on": "customer_reference",
+   "fetch_if_empty": 1,
+   "fieldname": "client_site_address",
+   "fieldtype": "Link",
+   "label": "Client Site Address",
+   "options": "Address"
+  },
+  {
+   "depends_on": "customer_reference",
+   "fetch_from": "client_name.customer_primary_contact",
+   "fetch_if_empty": 1,
+   "fieldname": "client_contact",
+   "fieldtype": "Link",
+   "label": "Client Contact",
+   "options": "Contact"
+  },
+  {
+   "fieldname": "column_break_jdu7a",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "customer_reference_comment",
+   "fieldtype": "Data",
+   "label": "Customer Reference Comment"
+  },
+  {
+   "fieldname": "column_break_cqwiv",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "grand_total_client",
+   "fieldtype": "Currency",
+   "label": "Grand Total Client",
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_break_o8kys",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "column_break_rpjhd",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "section_break_aolzu",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "column_break_tus8h",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_q777r",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_eduii",
+   "fieldtype": "Column Break"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2023-07-12 01:26:06.369538",
+ "modified_by": "Administrator",
+ "module": "Malaga",
+ "name": "Selection Sheet",
+ "naming_rule": "Expression (old style)",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

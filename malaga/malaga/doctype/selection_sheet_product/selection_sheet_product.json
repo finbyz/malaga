@@ -1,0 +1,104 @@
+{
+ "actions": [],
+ "creation": "2023-02-21 12:20:34.771275",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "item_code",
+  "item_name",
+  "code_on_box",
+  "selection_area",
+  "qty",
+  "rate",
+  "rate_client",
+  "item_image",
+  "amount",
+  "amount_client"
+ ],
+ "fields": [
+  {
+   "columns": 1,
+   "fetch_from": "item_code.custom_code_on_box",
+   "fieldname": "code_on_box",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Code on Box"
+  },
+  {
+   "columns": 2,
+   "fieldname": "selection_area",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Selection Area"
+  },
+  {
+   "columns": 1,
+   "default": "1",
+   "fieldname": "qty",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Quantity"
+  },
+  {
+   "columns": 1,
+   "fieldname": "rate",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Rate"
+  },
+  {
+   "columns": 1,
+   "fieldname": "amount",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Amount"
+  },
+  {
+   "columns": 1,
+   "fieldname": "item_code",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Item",
+   "options": "Item"
+  },
+  {
+   "columns": 2,
+   "fetch_from": "item_code.item_name",
+   "fieldname": "item_name",
+   "fieldtype": "Read Only",
+   "in_list_view": 1,
+   "label": "Product Name"
+  },
+  {
+   "fieldname": "rate_client",
+   "fieldtype": "Currency",
+   "label": "Rate Client"
+  },
+  {
+   "fieldname": "amount_client",
+   "fieldtype": "Currency",
+   "label": "Amount Client"
+  },
+  {
+   "columns": 1,
+   "fetch_from": "item_code.image",
+   "fieldname": "item_image",
+   "fieldtype": "Attach",
+   "in_list_view": 1,
+   "label": "Photo"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2023-07-12 21:47:04.189497",
+ "modified_by": "Administrator",
+ "module": "Malaga",
+ "name": "Selection Sheet Product",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

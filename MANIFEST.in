@@ -1,0 +1,18 @@
+include MANIFEST.in
+include requirements.txt
+include *.json
+include *.md
+include *.py
+include *.txt
+recursive-include malaga *.css
+recursive-include malaga *.csv
+recursive-include malaga *.html
+recursive-include malaga *.ico
+recursive-include malaga *.js
+recursive-include malaga *.json
+recursive-include malaga *.md
+recursive-include malaga *.png
+recursive-include malaga *.py
+recursive-include malaga *.svg
+recursive-include malaga *.txt
+recursive-exclude malaga *.pyc
