@@ -1,4 +1,54 @@
+import frappe
+
+from erpnext.stock.stock_ledger import update_entries_after, make_entry as erpnext_make_entry
+from erpnext.stock import stock_ledger as stock_ledger_module
+from erpnext.stock.doctype.stock_entry.stock_entry import StockEntry
+from erpnext.stock.doctype.pick_list.pick_list import PickList
+from erpnext.controllers.taxes_and_totals import calculate_taxes_and_totals
+from erpnext.stock.doctype.stock_ledger_entry.stock_ledger_entry import StockLedgerEntry
+from erpnext.stock.doctype.delivery_note.delivery_note import DeliveryNote
 from . import __version__ as app_version
+
+from malaga.override_default_class_method import (
+	raise_exceptions, set_actual_qty, set_item_locations,
+	pick_list_before_submit, get_current_tax_amount,
+	determine_exclusive_rate, calculate_taxes, actual_amt_check
+)
+from malaga.override.delivery_note import validate as delivery_validate
+from malaga.override.pick_list import validate_warehouses as pick_list_validate_warehouses
+from malaga.doc_events.stock_ledger_entry import get_batch_no_for_args, get_batch_no_for_sle
+
+update_entries_after.raise_exceptions = raise_exceptions
+StockEntry.set_actual_qty = set_actual_qty
+PickList.set_item_locations = set_item_locations
+PickList.before_submit = pick_list_before_submit
+PickList.validate_warehouses = pick_list_validate_warehouses
+calculate_taxes_and_totals.get_current_tax_amount = get_current_tax_amount
+calculate_taxes_and_totals.determine_exclusive_rate = determine_exclusive_rate
+calculate_taxes_and_totals.calculate_taxes = calculate_taxes
+StockLedgerEntry.actual_amt_check = actual_amt_check
+DeliveryNote.validate = delivery_validate
+
+
+def make_entry_with_batch(args, allow_negative_stock=False, via_landed_cost_voucher=False):
+	if not args.get("batch_no"):
+		batch_no = get_batch_no_for_args(args)
+		if batch_no:
+			args["batch_no"] = batch_no
+
+	sle = erpnext_make_entry(args, allow_negative_stock, via_landed_cost_voucher)
+
+	if not sle.batch_no:
+		batch_no = get_batch_no_for_sle(sle)
+		if batch_no:
+			frappe.db.set_value("Stock Ledger Entry", sle.name, "batch_no", batch_no, update_modified=False)
+			sle.batch_no = batch_no
+
+	return sle
+
+
+stock_ledger_module.make_entry = make_entry_with_batch
+
 
 app_name = "malaga"
 app_title = "Malaga"
@@ -12,181 +62,80 @@ app_license = "MIT"
 
 # include js, css files in header of desk.html
 # app_include_css = "/assets/malaga/css/malaga.css"
-# app_include_js = "/assets/malaga/js/malaga.js"
-
-# include js, css files in header of web template
-# web_include_css = "/assets/malaga/css/malaga.css"
-# web_include_js = "/assets/malaga/js/malaga.js"
-
-# include custom scss in every website theme (without file extension ".scss")
-# website_theme_scss = "malaga/public/scss/website"
-
-# include js, css files in header of web form
-# webform_include_js = {"doctype": "public/js/doctype.js"}
-# webform_include_css = {"doctype": "public/css/doctype.css"}
-
-# include js in page
-# page_js = {"page" : "public/js/file.js"}
+app_include_js = "/assets/malaga/js/serial_no_batch_selector.js"
 
 # include js in doctype views
-# doctype_js = {"doctype" : "public/js/doctype.js"}
-# doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
-# doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
-# doctype_calendar_js = {"doctype" : "public/js/doctype_calendar.js"}
-
-# Home Pages
-# ----------
-
-# application home page (will override Website Settings)
-# home_page = "login"
-
-# website user home page (by Role)
-# role_home_page = {
-# 	"Role": "home_page"
-# }
-
-# Generators
-# ----------
-
-# automatically create page for each record of this doctype
-# website_generators = ["Web Page"]
-
-# Jinja
-# ----------
-
-# add methods and filters to jinja environment
-# jinja = {
-# 	"methods": "malaga.utils.jinja_methods",
-# 	"filters": "malaga.utils.jinja_filters"
-# }
-
-# Installation
-# ------------
-
-# before_install = "malaga.install.before_install"
-# after_install = "malaga.install.after_install"
-
-# Uninstallation
-# ------------
-
-# before_uninstall = "malaga.uninstall.before_uninstall"
-# after_uninstall = "malaga.uninstall.after_uninstall"
-
-# Desk Notifications
-# ------------------
-# See frappe.core.notifications.get_notification_config
-
-# notification_config = "malaga.notifications.get_notification_config"
-
-# Permissions
-# -----------
-# Permissions evaluated in scripted ways
-
-# permission_query_conditions = {
-# 	"Event": "frappe.desk.doctype.event.event.get_permission_query_conditions",
-# }
-#
-# has_permission = {
-# 	"Event": "frappe.desk.doctype.event.event.has_permission",
-# }
-
-# DocType Class
-# ---------------
-# Override standard doctype classes
-
-# override_doctype_class = {
-# 	"ToDo": "custom_app.overrides.CustomToDo"
-# }
-
-# Document Events
-# ---------------
-# Hook on document methods and events
-
-# doc_events = {
-# 	"*": {
-# 		"on_update": "method",
-# 		"on_cancel": "method",
-# 		"on_trash": "method"
-# 	}
-# }
-
-# Scheduled Tasks
-# ---------------
-
-# scheduler_events = {
-# 	"all": [
-# 		"malaga.tasks.all"
-# 	],
-# 	"daily": [
-# 		"malaga.tasks.daily"
-# 	],
-# 	"hourly": [
-# 		"malaga.tasks.hourly"
-# 	],
-# 	"weekly": [
-# 		"malaga.tasks.weekly"
-# 	],
-# 	"monthly": [
-# 		"malaga.tasks.monthly"
-# 	],
-# }
-
-# Testing
-# -------
-
-# before_tests = "malaga.install.before_tests"
-
-# Overriding Methods
-# ------------------------------
-#
-# override_whitelisted_methods = {
-# 	"frappe.desk.doctype.event.event.get_events": "malaga.event.get_events"
-# }
-#
-# each overriding function accepts a `data` argument;
-# generated from the base implementation of the doctype dashboard,
-# along with any modifications made in other Frappe apps
-# override_doctype_dashboards = {
-# 	"Task": "malaga.task.get_dashboard_data"
-# }
-
-# exempt linked doctypes from being automatically cancelled
-#
-# auto_cancel_exempted_doctypes = ["Auto Repeat"]
-
-
-# User Data Protection
-# --------------------
-
-# user_data_fields = [
-# 	{
-# 		"doctype": "{doctype_1}",
-# 		"filter_by": "{filter_by}",
-# 		"redact_fields": ["{field_1}", "{field_2}"],
-# 		"partial": 1,
-# 	},
-# 	{
-# 		"doctype": "{doctype_2}",
-# 		"filter_by": "{filter_by}",
-# 		"partial": 1,
-# 	},
-# 	{
-# 		"doctype": "{doctype_3}",
-# 		"strict": False,
-# 	},
-# 	{
-# 		"doctype": "{doctype_4}"
-# 	}
-# ]
-
-override_doctype_class = {
-    "Sales Order": "malaga.override.sales_order.SalesOrderCustom",
-    "Quotation": "malaga.override.quotation.QuotationCustom",
+doctype_js = {
+	"Pick List": "public/js/doctype_js/pick_list.js",
+	"Sales Order": "public/js/doctype_js/sales_order.js",
+	"Delivery Note": "public/js/doctype_js/delivery_note.js",
 }
 
-# Authentication and authorization
-# --------------------------------
+# Document Events
+doc_events = {
+	"Batch": {
+		"before_insert": "malaga.doc_events.batch.before_insert",},
+	"Stock Ledger Entry": {
+		"before_insert": "malaga.doc_events.stock_ledger_entry.set_batch_from_voucher_detail",
+		"validate": "malaga.doc_events.stock_ledger_entry.set_batch_from_voucher_detail",
+		"on_submit": "malaga.doc_events.stock_ledger_entry.persist_batch_on_sle",
+	},
+	"Pick List": {
+		"before_validate": "malaga.doc_events.pick_list.before_validate",
+		"validate": "malaga.doc_events.pick_list.validate",
+		"before_submit": "malaga.doc_events.pick_list.before_submit",
+		"on_submit": "malaga.doc_events.pick_list.on_submit",
+		"on_cancel": "malaga.doc_events.pick_list.on_cancel",
+		"before_update_after_submit": "malaga.doc_events.pick_list.before_update_after_submit",
+	},
+	"Sales Order": {
+		"before_validate": "malaga.doc_events.sales_order.before_validate",
+		"validate": "malaga.doc_events.sales_order.validate",
+		"on_submit": "malaga.doc_events.sales_order.on_submit",
+		"before_validate_after_submit": "malaga.doc_events.sales_order.before_validate_after_submit",
+		"before_update_after_submit": "malaga.doc_events.sales_order.before_update_after_submit",
+		"on_update_after_submit": "malaga.doc_events.sales_order.on_update_after_submit",
+		"on_cancel": "malaga.doc_events.sales_order.on_cancel",
+	},
+	"Delivery Note": {
+		"before_validate": "malaga.doc_events.delivery_note.before_validate",
+		"validate": "malaga.doc_events.delivery_note.validate",
+		"before_save": "malaga.doc_events.delivery_note.before_save",
+		"before_submit": "malaga.doc_events.delivery_note.before_submit",
+		"on_submit": "malaga.doc_events.delivery_note.on_submit",
+		"on_cancel": "malaga.doc_events.delivery_note.on_cancel",
+		"on_update_after_submit": "malaga.doc_events.delivery_note.on_update_after_submit",
+	},
+}
 
-# auth_hooks = [
-# 	"malaga.auth.validate"
-# ]
+override_doctype_dashboards = {
+	"Pick List": "malaga.dashboard.pick_list.get_data",
+}
+
+doctype_list_js = {
+	"Pick List": "public/js/pick_list_list.js",
+	"Sales Order": "public/js/doctype_js/sales_order_list.js",
+}
+
+# DocType Class Overrides
+override_doctype_class = {
+	"Sales Order": "malaga.override.sales_order.SalesOrderCustom",
+	"Quotation": "malaga.override.quotation.QuotationCustom",
+}
+
+scheduler_events = {
+	"daily": [
+		"malaga.doc_events.sales_order.schedule_daily",
+	],
+}
+
+fixtures = [
+	{
+		"dt": "Custom Field",
+		"filters": {"module": ["in", ["malaga"]]},
+	},
+	{
+		"dt": "Property Setter",
+		"filters": {"module": ["in", ["malaga"]]},
+	},
+]

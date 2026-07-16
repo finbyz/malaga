@@ -1,0 +1,469 @@
+{
+ "actions": [],
+ "allow_import": 1,
+ "allow_rename": 1,
+ "autoname": "field:item_name",
+ "creation": "2026-06-17 18:44:17.610782",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "item_name",
+  "item_design",
+  "item_group",
+  "is_item_series",
+  "maintain_stock",
+  "disabled",
+  "image",
+  "column_break_6",
+  "item_group_code",
+  "item_group_name",
+  "uom",
+  "amended_from",
+  "cover_image",
+  "item_detail_section",
+  "item_series",
+  "tile_body_composition",
+  "tile_use",
+  "tile_size",
+  "tile_size_item",
+  "tile_type",
+  "tile_type_item",
+  "tile_surface",
+  "tile_surface_item",
+  "tile_texture",
+  "column_break_18",
+  "tile_color",
+  "tile_shape",
+  "tile_price",
+  "tile_thickness",
+  "tile_anti_slip_properties",
+  "tile_technical",
+  "punch_no",
+  "default_production_price",
+  "price_list",
+  "section_break_12",
+  "tile_quality",
+  "section_break_10",
+  "item_defaults",
+  "website_section",
+  "show_in_website",
+  "show_in_website_variant",
+  "route",
+  "weightage",
+  "slideshow",
+  "website_image",
+  "thumbnail",
+  "column_break_37",
+  "website_warehouse",
+  "website_item_groups",
+  "set_meta_tags"
+ ],
+ "fields": [
+  {
+   "bold": 1,
+   "fieldname": "item_name",
+   "fieldtype": "Data",
+   "label": "Item Name",
+   "no_copy": 1,
+   "read_only": 1,
+   "reqd": 1,
+   "unique": 1
+  },
+  {
+   "fieldname": "item_design",
+   "fieldtype": "Data",
+   "label": "Item Design"
+  },
+  {
+   "fieldname": "item_group",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Item Group",
+   "options": "Item Group",
+   "reqd": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "is_item_series",
+   "fieldtype": "Check",
+   "label": "Is Item Series"
+  },
+  {
+   "default": "1",
+   "fieldname": "maintain_stock",
+   "fieldtype": "Check",
+   "hidden": 1,
+   "in_list_view": 1,
+   "label": "Maintain Stock",
+   "reqd": 1
+  },
+  {
+   "allow_on_submit": 1,
+   "default": "0",
+   "fieldname": "disabled",
+   "fieldtype": "Check",
+   "label": "Disabled"
+  },
+  {
+   "allow_on_submit": 1,
+   "depends_on": "eval:!doc.__islocal",
+   "fieldname": "image",
+   "fieldtype": "Attach Image",
+   "label": "Image"
+  },
+  {
+   "fieldname": "column_break_6",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fetch_from": "item_group.item_group_code",
+   "fieldname": "item_group_code",
+   "fieldtype": "Data",
+   "label": "Item Group Code",
+   "read_only": 1,
+   "reqd": 1
+  },
+  {
+   "fetch_from": "item_group.item_name",
+   "fieldname": "item_group_name",
+   "fieldtype": "Data",
+   "label": "item_group_name",
+   "read_only": 1,
+   "reqd": 1
+  },
+  {
+   "default": "Box",
+   "fetch_from": "item_series.stock_uom",
+   "fieldname": "uom",
+   "fieldtype": "Link",
+   "label": "UOM",
+   "options": "UOM",
+   "reqd": 1
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Tile Item Creation Tool",
+   "print_hide": 1,
+   "read_only": 1
+  },
+  {
+   "allow_on_submit": 1,
+   "depends_on": "eval:!doc.__islocal",
+   "fieldname": "cover_image",
+   "fieldtype": "Attach Image",
+   "label": "Cover Image"
+  },
+  {
+   "fieldname": "item_detail_section",
+   "fieldtype": "Section Break",
+   "label": "Item Detail"
+  },
+  {
+   "depends_on": "eval:!doc.is_item_series",
+   "fetch_from": "item_group.item_series",
+   "fieldname": "item_series",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Item Series",
+   "options": "Item"
+  },
+  {
+   "fetch_from": "item_group.tile_body_composition",
+   "fetch_if_empty": 1,
+   "fieldname": "tile_body_composition",
+   "fieldtype": "Link",
+   "label": "Tile Body Composition",
+   "options": "Tile Body Composition"
+  },
+  {
+   "fetch_from": "item_group.tile_use",
+   "fetch_if_empty": 1,
+   "fieldname": "tile_use",
+   "fieldtype": "Link",
+   "label": "Tile Use",
+   "options": "Tile Use"
+  },
+  {
+   "fetch_from": "item_group.tile_size",
+   "fetch_if_empty": 1,
+   "fieldname": "tile_size",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Tile Size",
+   "options": "Tile Size",
+   "reqd": 1
+  },
+  {
+   "fetch_from": "tile_size.tile_size_item",
+   "fieldname": "tile_size_item",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Tile Size Item",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "item_group.tile_type",
+   "fetch_if_empty": 1,
+   "fieldname": "tile_type",
+   "fieldtype": "Link",
+   "label": "Tile Type",
+   "options": "Tile Type",
+   "reqd": 1
+  },
+  {
+   "fetch_from": "tile_type.tile_type_item",
+   "fieldname": "tile_type_item",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Tile Type Item",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "item_group.tile_surface",
+   "fetch_if_empty": 1,
+   "fieldname": "tile_surface",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Tile Surface",
+   "options": "Tile Surface",
+   "reqd": 1
+  },
+  {
+   "fetch_from": "tile_surface.tile_surface_item",
+   "fieldname": "tile_surface_item",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Tile Surface Item",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "item_group.tile_texture",
+   "fetch_if_empty": 1,
+   "fieldname": "tile_texture",
+   "fieldtype": "Link",
+   "label": "Tile Texture",
+   "options": "Tile Texture"
+  },
+  {
+   "fieldname": "column_break_18",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fetch_from": "item_group.tile_color",
+   "fetch_if_empty": 1,
+   "fieldname": "tile_color",
+   "fieldtype": "Link",
+   "label": "Tile Color",
+   "options": "Tile Color"
+  },
+  {
+   "fetch_from": "item_group.tile_shape",
+   "fetch_if_empty": 1,
+   "fieldname": "tile_shape",
+   "fieldtype": "Link",
+   "label": "Tile Shape",
+   "options": "Tile Shape"
+  },
+  {
+   "fetch_from": "item_group.tile_price",
+   "fetch_if_empty": 1,
+   "fieldname": "tile_price",
+   "fieldtype": "Link",
+   "label": "Tile Price",
+   "options": "Tile Price"
+  },
+  {
+   "fetch_from": "item_group.tile_thickness",
+   "fetch_if_empty": 1,
+   "fieldname": "tile_thickness",
+   "fieldtype": "Link",
+   "label": "Tile Thickness",
+   "options": "Tile Thickness"
+  },
+  {
+   "fetch_from": "item_group.tile_anti_slip_properties",
+   "fetch_if_empty": 1,
+   "fieldname": "tile_anti_slip_properties",
+   "fieldtype": "Link",
+   "label": "Tile Anti Slip Properties",
+   "options": "Tile Anti Slip Properties"
+  },
+  {
+   "fetch_from": "item_group.tile_technical",
+   "fetch_if_empty": 1,
+   "fieldname": "tile_technical",
+   "fieldtype": "Link",
+   "label": "Tile Technical",
+   "options": "Tile Technical"
+  },
+  {
+   "fetch_from": "item_group.punch_no",
+   "fetch_if_empty": 1,
+   "fieldname": "punch_no",
+   "fieldtype": "Link",
+   "label": "Punch No",
+   "options": "Punch No"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "default_production_price",
+   "fieldtype": "Currency",
+   "hidden": 1,
+   "label": "Default Production Price"
+  },
+  {
+   "default": "Production",
+   "fieldname": "price_list",
+   "fieldtype": "Link",
+   "hidden": 1,
+   "label": "Price List",
+   "options": "Price List"
+  },
+  {
+   "fieldname": "section_break_12",
+   "fieldtype": "Section Break"
+  },
+  {
+   "depends_on": "eval: !doc.is_item_series",
+   "fieldname": "tile_quality",
+   "fieldtype": "Table",
+   "label": "Tile Quality",
+   "options": "Tile Item TIle Quality",
+   "reqd": 1
+  },
+  {
+   "fieldname": "section_break_10",
+   "fieldtype": "Section Break"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "item_defaults",
+   "fieldtype": "Table",
+   "label": "Item Defaults",
+   "options": "Item Creation Defaults"
+  },
+  {
+   "fieldname": "website_section",
+   "fieldtype": "Section Break",
+   "label": "Website"
+  },
+  {
+   "default": "0",
+   "depends_on": "eval:!doc.variant_of",
+   "fieldname": "show_in_website",
+   "fieldtype": "Check",
+   "label": "Show in Website"
+  },
+  {
+   "default": "0",
+   "depends_on": "variant_of",
+   "fieldname": "show_in_website_variant",
+   "fieldtype": "Check",
+   "label": "Show in Website (Variant)"
+  },
+  {
+   "depends_on": "eval: doc.show_in_website || doc.show_variant_in_website",
+   "fieldname": "route",
+   "fieldtype": "Small Text",
+   "label": "Route"
+  },
+  {
+   "depends_on": "eval: doc.show_in_website || doc.show_variant_in_website",
+   "fieldname": "weightage",
+   "fieldtype": "Int",
+   "label": "Weightage"
+  },
+  {
+   "depends_on": "eval: doc.show_in_website || doc.show_variant_in_website",
+   "fieldname": "slideshow",
+   "fieldtype": "Link",
+   "label": "Slideshow",
+   "options": "Website Slideshow"
+  },
+  {
+   "depends_on": "eval: (doc.show_in_website || doc.show_variant_in_website) && !doc.__islocal",
+   "fieldname": "website_image",
+   "fieldtype": "Attach",
+   "label": "Website Image"
+  },
+  {
+   "fieldname": "thumbnail",
+   "fieldtype": "Data",
+   "label": "Thumbnail",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_37",
+   "fieldtype": "Column Break"
+  },
+  {
+   "depends_on": "eval: doc.show_in_website || doc.show_variant_in_website",
+   "fieldname": "website_warehouse",
+   "fieldtype": "Link",
+   "ignore_user_permissions": 1,
+   "label": "Website Warehouse",
+   "options": "Warehouse"
+  },
+  {
+   "depends_on": "eval: doc.show_in_website || doc.show_variant_in_website",
+   "fieldname": "website_item_groups",
+   "fieldtype": "Table",
+   "label": "Website Item Groups",
+   "options": "Website Item Group"
+  },
+  {
+   "depends_on": "eval: doc.show_in_website || doc.show_variant_in_website",
+   "fieldname": "set_meta_tags",
+   "fieldtype": "Button",
+   "label": "Set Meta Tags"
+  }
+ ],
+ "grid_page_length": 50,
+ "image_field": "image",
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2026-06-17 18:44:17.610782",
+ "modified_by": "Administrator",
+ "module": "Malaga",
+ "name": "Tile Item Creation Tool",
+ "naming_rule": "By fieldname",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Item Manager",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}

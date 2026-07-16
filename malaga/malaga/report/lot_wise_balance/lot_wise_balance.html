@@ -1,0 +1,252 @@
+<style>
+    table
+     {
+        width: 100%;
+        border: 0;
+        border-collapse: collapse;
+    }
+
+    td {
+        padding: 0 0 0 0 !important;
+        margin: 0;
+        border: 0;
+    }
+
+    td.last {
+        padding: 0;
+        margin: 0;
+        border: 0;
+    }
+
+
+    .border-top {
+        border-top: 1px solid #f67d2a;
+    }
+
+    .border-bottom {
+        border-bottom: 1px solid #f67d2a;
+    }
+
+
+    p.field-title {
+        font-size: 16px;
+        color: #002c67;
+        padding: 0 !important;
+    }
+
+    p.text-size {
+        font-size: 14px;
+        color: #6c757d !important;
+        padding: 0 !important;
+    }
+
+    .center {
+        text-align: center;
+    }
+
+    .img-background {
+        position: absolute;
+        width: 140px;
+        height: 140px;
+        background-color: #002c67;
+        opacity: 0.99 !important
+    }
+
+    .product-img {
+        position: relative;
+        top: 20px;
+        left: 20px;
+        max-width: 140px !important;
+        max-height: 140px !important;
+        object-fit: cover !important;
+        opacity: 0.99 !important;
+        box-shadow: 6px 7px 12px -3px rgba(0,0,0,0.53) !important;
+    }
+    
+    .group-text {
+        font-size: 19px !important;
+    }
+
+    .print-format td,
+    .print-format th {
+        padding: 0 !important;
+    }
+
+
+
+    .item-name {
+        font-size: 16px;
+        font-weight: 600 !important;
+    }
+
+    .item-table-wrapper {
+        padding: 5px 0;
+        border-top: 1px solid #f67d2a;
+    }
+
+    @media print {
+        @page {
+            size: portrait !important
+        }
+    }
+
+    .overlap-wrapper {
+        height: 160px;
+    }
+
+
+</style>
+
+{% var i = 0 %}
+{% var j = 0 %}
+{% var total = 0 %}
+
+
+{% while(i<data.length && data[i].item_group) { %}
+<table>
+    {% if(i==0 || data[i].item_group!=data[i-1].item_group) { %}
+    
+    <tr>
+        <td>
+            <table class="group-table">
+                <tbody>
+                    <tr>
+                        <td width="10%" >
+                            <p class="field-title group-text" style="font-weight: 400; color: #002c67 !important"> Group:</p>
+
+                        </td>
+                        <td>
+                            <p class="text-size group-text" style="font-weight: 600; color: #000 !important;">{{ data[i].item_group }}</p>
+
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </td>
+    </tr>
+    {% } %}
+
+    <tr>
+        <td>
+            <div class="item-table-wrapper">
+                <table class="item-table" cellspacing="0" cellpadding="0" width="100%" style="padding: 10%;">
+                    <thead>
+
+                    </thead>
+                    <tbody class="">
+
+                        <tr>
+                            <td valign="top" width="30%" colspan="2" rowspan="5" style="position: relative;"
+                                valign="top">
+                                <div class="overlap-wrapper">
+                                    <div class="img-background"></div>
+                                    {% if(data[i].image){ %}
+                                    <img  class="product-img" src="{{data[i].image}}"
+                                        alt="tile-image">
+                                    {% } else { %}
+                                    <img  class="product-img" src="/files/no-image.png"
+                                        alt="tile-image">
+                                    {% } %}
+                                </div>
+                            </td>
+
+                            <td width="70%" valign="top">
+                                <table width="100%">
+                                    <thead>
+                                        <tr>
+                                            <td colspan="4" width="70%">
+                                                <p class="field-title item-name">{{data[i].item_design}} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;({{data[i].item_group}})
+                                                </p>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <p class="field-title">Quality</p>
+                                            </td>
+                                            <td align="right">
+                                                <p class="field-title">Lot No.</p>
+                                            </td>
+                                            {% if(filters.print_with_picked_qty==1){ %}
+                                                <td align="right">
+                                                    <p class="field-title">Balance</p>
+                                                </td>
+                                                <td align="right">
+                                                    <p class="field-title">Picked</p>
+                                                </td>
+                                            {% } %}
+                                            {% if(filters.print_with_unlocked_qty==1){ %}
+                                                <td align="right">
+                                                    <p class="field-title">Reserved</p>
+                                                </td>
+                                            {% } %}
+                                            <td align="right">
+                                                <p class="field-title">Available</p>
+                                            </td>
+                                            <td align="right">
+                                                <p class="field-title">Total</p>
+                                            </td>
+                                        </tr>
+
+                                    </thead>
+                                    <tbody>
+                                        {% while(1){ %}
+                                        <tr>
+                                            <td>
+                                                {% if(i>0 && data[i].tile_quality == data[i-1].tile_quality && data[i].item_design == data[i-1].item_design){ %}
+                                                <p class="text-size"></p>
+                                                {% } else { %}
+                                                <p class="text-size">{{data[i].tile_quality}}</p>
+                                                {% } %}
+                                            </td>
+                                            <td align="right">
+                                                <p class="text-size">{{data[i].lot_no}}</p>
+                                            </td>
+                                            {% if(filters.print_with_picked_qty==1){ %}
+                                            <td align="right">
+                                                <p class="text-size">{{data[i].balance_qty}}</p>
+                                            </td>
+                                            <td align="right">
+                                                <p class="text-size">{{data[i].picked_qty}}</p>
+                                            </td>
+                                            {% } %}
+                                            {% if(filters.print_with_unlocked_qty==1){ %}
+                                            <td align="right">
+                                                <p class="text-size">{{data[i].unlocked_qty}}</p>
+                                            </td>  
+                                            {% } %}
+                                            <td align="right">
+                                                <p class="text-size">{{data[i].remaining_qty}}</p>
+                                            </td>
+
+                                            <td align="right">
+                                                {% if(i==0 || data[i].tile_quality != data[i-1].tile_quality || data[i].item_design!=data[i-1].item_design){ %} 
+                                                    {% total = 0%}
+                                                    {% thisQuality = data[i].tile_quality %}
+                                                    {% thisDesign = data[i].item_design %}
+                                                    {% j = i %}
+                                                        {% while(data[j].tile_quality==thisQuality && data[j].item_design==thisDesign){ %}
+                                                            {% total = total + data[j].remaining_qty %}
+                                                            {% j = j+1 %}
+                                                        {% } %}
+                                                    <p class="text-size">{{total}}</p>
+                                                {% }%}
+                                            </td>
+                                        </tr>
+                                        {% if(i!=data.length-1 && data[i].item_design == data[i+1].item_design){ %}
+                                        {% i = i+1 %}
+                                        {% } else { %}
+                                        {% break  %}
+                                        {% } %}
+                                        {% } %}
+                                    </tbody>
+                                </table>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </td>
+    </tr>
+</table>
+{% i = i+1 %}
+{% } %}
