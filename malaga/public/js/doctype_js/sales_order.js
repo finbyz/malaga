@@ -999,6 +999,48 @@ function make_delivery_note(frm) {
 	});
 }
 
+// function apply_box_qty_conversion(frm, cdt, cdn) {
+// 	let row = locals[cdt][cdn];
+
+// 	if (!row.item_code || !row.qty) {
+// 		return;
+// 	}
+
+// 	frappe.db.get_value(
+// 		"Item",
+// 		row.item_code,
+// 		["allow_box_conversion", "custom_box_qty_sqm"]
+// 	).then(r => {
+// 		let item = r.message;
+// 		if (!item || !item.allow_box_conversion || !item.custom_box_qty_sqm) {
+// 			return;
+// 		}
+
+// 		let box_qty = flt(item.custom_box_qty_sqm);
+// 		if (box_qty <= 0) {
+// 			return;
+// 		}
+
+// 		let original_qty = flt(row.qty);
+// 		let multiples = Math.floor((original_qty / box_qty) + 0.5);  // round-half-up
+// 		if (multiples < 1) {
+// 			multiples = 1;
+// 		}
+
+// 		let new_qty = flt(multiples * box_qty, precision("qty", row));
+
+// 		// guard against float precision loops re-triggering this handler forever
+// 		if (Math.abs(new_qty - original_qty) > 0.0001) {
+// 			frappe.model.set_value(cdt, cdn, "qty", new_qty);
+// 			frappe.show_alert({
+// 				message: __("Row {0}: Qty adjusted from {1} to {2} to match box quantity of {3} for item {4}.",
+// 					[row.idx, original_qty, new_qty, box_qty, row.item_code]),
+// 				indicator: "orange"
+// 			});
+// 		}
+// 	});
+// }
+
 function apply_box_qty_conversion(frm, cdt, cdn) {
 	let row = locals[cdt][cdn];
 
@@ -1009,9 +1051,16 @@ function apply_box_qty_conversion(frm, cdt, cdn) {
 	frappe.db.get_value(
 		"Item",
 		row.item_code,
-		["allow_box_conversion", "custom_box_qty_sqm"]
+		[
+			"allow_box_conversion",
+			"custom_box_qty_sqm",
+			"auto_roundoff_qty",
+			"only_round_up_qty",
+			"only_round_down_qty"
+		]
 	).then(r => {
 		let item = r.message;
+
 		if (!item || !item.allow_box_conversion || !item.custom_box_qty_sqm) {
 			return;
 		}
@@ -1022,19 +1071,46 @@ function apply_box_qty_conversion(frm, cdt, cdn) {
 		}
 
 		let original_qty = flt(row.qty);
-		let multiples = Math.floor((original_qty / box_qty) + 0.5);  // round-half-up
+		let ratio = original_qty / box_qty;
+		let multiples = 1;
+
+		// Apply rounding logic
+		if (item.auto_roundoff_qty) {
+			// Round to nearest box quantity
+			multiples = Math.round(original_qty / box_qty);
+		}
+		else if (item.only_round_up_qty) {
+			// Always round up
+			multiples = Math.ceil(original_qty / box_qty);
+		}
+		else if (item.only_round_down_qty) {
+			// Always round down
+			multiples = Math.floor(original_qty / box_qty);
+		}
+		else {
+			// Default to nearest if no option is selected
+			multiples = Math.round(original_qty / box_qty);
+		}
+
+		// Ensure at least one box
 		if (multiples < 1) {
 			multiples = 1;
 		}
 
-		let new_qty = flt(multiples * box_qty, precision("qty", row));
+		let new_qty = flt(
+			multiples * box_qty,
+			precision("qty", row)
+		);
 
-		// guard against float precision loops re-triggering this handler forever
+		// Prevent infinite loop due to floating-point precision
 		if (Math.abs(new_qty - original_qty) > 0.0001) {
 			frappe.model.set_value(cdt, cdn, "qty", new_qty);
+
 			frappe.show_alert({
-				message: __("Row {0}: Qty adjusted from {1} to {2} to match box quantity of {3} for item {4}.",
-					[row.idx, original_qty, new_qty, box_qty, row.item_code]),
+				message: __(
+					"Row {0}: Qty adjusted from {1} to {2} using box quantity {3}.",
+					[row.idx, original_qty, new_qty, box_qty]
+				),
 				indicator: "orange"
 			});
 		}
