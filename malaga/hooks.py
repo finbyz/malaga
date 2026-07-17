@@ -69,7 +69,9 @@ doctype_js = {
 	"Pick List": "public/js/doctype_js/pick_list.js",
 	"Sales Order": "public/js/doctype_js/sales_order.js",
 	"Delivery Note": "public/js/doctype_js/delivery_note.js",
- "Item": "public/js/doctype_js/item.js",
+	"Quotation": "public/js/doctype_js/quotation.js",
+	"Sales Invoice": "public/js/doctype_js/sales_invoice.js",
+ 	"Item": "public/js/doctype_js/item.js",
 }
 
 # Document Events

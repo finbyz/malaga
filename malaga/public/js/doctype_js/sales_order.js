@@ -854,7 +854,10 @@ frappe.ui.form.on("Sales Order Item", {
 				frappe.model.set_value(cdt, cdn, 'packing_type', r.default_packing_type);
 			}
 		});
-		setTimeout(() => apply_box_qty_conversion(frm, cdt, cdn), 500);
+		setTimeout(() => {
+			apply_box_qty_conversion(frm, cdt, cdn);
+			set_box_value(frm, cdt, cdn);
+		}, 500);
 	},
 
 	sqf_rate: function (frm, cdt, cdn) {
@@ -885,7 +888,24 @@ frappe.ui.form.on("Sales Order Item", {
 				frappe.model.set_value(cdt, cdn, "conversion_factor", d.stock_qty / d.qty);
 			}
 		}
+
+		let row = locals[cdt][cdn];
+		if (row._updating_from_box) {
+			row._updating_from_box = false;
+			return;
+		}
 		apply_box_qty_conversion(frm, cdt, cdn);
+		set_box_value(frm, cdt, cdn);
+	},
+
+	box(frm, cdt, cdn) {
+		let row = locals[cdt][cdn];
+		if (row._updating_from_qty) {
+			row._updating_from_qty = false;
+			return;
+		}
+
+		set_qty_from_box(frm, cdt, cdn);
 	},
 
 	real_qty: function (frm, cdt, cdn) {
@@ -1114,5 +1134,63 @@ function apply_box_qty_conversion(frm, cdt, cdn) {
 				indicator: "orange"
 			});
 		}
+	});
+}
+
+
+function set_box_value(frm, cdt, cdn) {
+	let row = locals[cdt][cdn];
+
+	if (!row.item_code || !row.qty) {
+		frappe.model.set_value(cdt, cdn, "box", 0);
+		return;
+	}
+
+	frappe.db.get_value(
+		"Item",
+		row.item_code,
+		"custom_box_qty_sqm"
+	).then(r => {
+		let box_qty = flt(r.message.custom_box_qty_sqm);
+
+		if (!box_qty || box_qty <= 0) {
+			frappe.model.set_value(cdt, cdn, "box", 0);
+			return;
+		}
+
+		let boxes = flt(
+			flt(row.qty) / box_qty,
+			precision("box", row)
+		);
+
+		frappe.model.set_value(cdt, cdn, "box", boxes);
+	});
+}
+
+
+function set_qty_from_box(frm, cdt, cdn) {
+	let row = locals[cdt][cdn];
+
+	if (!row.item_code || !row.box) {
+		return;
+	}
+
+	frappe.db.get_value(
+		"Item",
+		row.item_code,
+		"custom_box_qty_sqm"
+	).then(r => {
+
+		let box_qty = flt(r.message.custom_box_qty_sqm);
+
+		if (!box_qty) return;
+
+		let qty = flt(
+			flt(row.box) * box_qty,
+			precision("qty", row)
+		);
+
+		row._updating_from_box = true;
+		frappe.model.set_value(cdt, cdn, "qty", qty);
 	});
 }
