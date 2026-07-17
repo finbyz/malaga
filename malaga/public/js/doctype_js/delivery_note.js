@@ -611,7 +611,7 @@ frappe.ui.form.on("Delivery Note", {
 
 // Delivery Note Item events (unchanged except using frm parameter)
 frappe.ui.form.on("Delivery Note Item", {
-	qty(frm, cdt, cdn) {
+	qty : async function (frm, cdt, cdn) {
 		let d = locals[cdt][cdn];
 		frm.events.calculate_total(frm);
 		if (d.uom != d.stock_uom) {
@@ -621,24 +621,21 @@ frappe.ui.form.on("Delivery Note Item", {
 			}
 		}
 		let row = locals[cdt][cdn];
-		if (row._updating_from_box) {
-			row._updating_from_box = false;
+		if (row._setting_qty) {
+			row._setting_qty = false;
 			return;
 		}
-
-		apply_box_qty_conversion(frm, cdt, cdn);
-		set_box_value(frm, cdt, cdn);
-
+		await apply_box_qty_conversion(frm, cdt, cdn);
 	},
 
-	box(frm, cdt, cdn) {
-		let row = locals[cdt][cdn];
-		if (row._updating_from_qty) {
-			row._updating_from_qty = false;
+	box: async function(frm, cdt, cdn) {
+			let row = locals[cdt][cdn];
+
+		if (row._setting_box) {
+			row._setting_box = false;
 			return;
 		}
-
-		set_qty_from_box(frm, cdt, cdn);
+			await set_qty_from_box(frm, cdt, cdn);
 	},
 
 	
@@ -672,22 +669,17 @@ frappe.ui.form.on("Delivery Note Item", {
 		}
 	},
 
-	item_code(frm, cdt, cdn) {
-		setTimeout(() => {
-			apply_box_qty_conversion(frm, cdt, cdn);
-			set_box_value(frm, cdt, cdn);
-		}, 500);
+	item_code: async function (frm, cdt, cdn) {
+		await apply_box_qty_conversion(frm, cdt, cdn);
 	},
 });
 
-function apply_box_qty_conversion(frm, cdt, cdn) {
-	let row = locals[cdt][cdn];
-
-	if (!row.item_code || !row.qty) {
-		return;
+async function get_box_details(row) {
+	if (row._box_details) {
+		return row._box_details;
 	}
 
-	frappe.db.get_value(
+	let r = await frappe.db.get_value(
 		"Item",
 		row.item_code,
 		[
@@ -697,120 +689,109 @@ function apply_box_qty_conversion(frm, cdt, cdn) {
 			"only_round_up_qty",
 			"only_round_down_qty"
 		]
-	).then(r => {
-		let item = r.message;
+	);
 
-		if (!item || !item.allow_box_conversion || !item.custom_box_qty_sqm) {
-			return;
-		}
-
-		let box_qty = flt(item.custom_box_qty_sqm);
-		if (box_qty <= 0) {
-			return;
-		}
-
-		let original_qty = flt(row.qty);
-		let ratio = original_qty / box_qty;
-		let multiples = 1;
-
-		// Apply rounding logic
-		if (item.auto_roundoff_qty) {
-			// Round to nearest box quantity
-			multiples = Math.round(original_qty / box_qty);
-		}
-		else if (item.only_round_up_qty) {
-			// Always round up
-			multiples = Math.ceil(original_qty / box_qty);
-		}
-		else if (item.only_round_down_qty) {
-			// Always round down
-			multiples = Math.floor(original_qty / box_qty);
-		}
-		else {
-			// Default to nearest if no option is selected
-			multiples = Math.round(original_qty / box_qty);
-		}
-
-		// Ensure at least one box
-		if (multiples < 1) {
-			multiples = 1;
-		}
-
-		let new_qty = flt(
-			multiples * box_qty,
-			precision("qty", row)
-		);
-
-		// Prevent infinite loop due to floating-point precision
-		if (Math.abs(new_qty - original_qty) > 0.0001) {
-			frappe.model.set_value(cdt, cdn, "qty", new_qty);
-
-			frappe.show_alert({
-				message: __(
-					"Row {0}: Qty adjusted from {1} to {2} using box quantity {3}.",
-					[row.idx, original_qty, new_qty, box_qty]
-				),
-				indicator: "orange"
-			});
-		}
-	});
-
-	
+	row._box_details = r.message || {};
+	return row._box_details;
 }
 
-function set_box_value(frm, cdt, cdn) {
+async function apply_box_qty_conversion(frm, cdt, cdn) {
+
 	let row = locals[cdt][cdn];
 
-	if (!row.item_code || !row.qty) {
-		frappe.model.set_value(cdt, cdn, "box", 0);
+	// Ignore if qty is being updated from box
+	if (row._setting_qty) {
+		row._setting_qty = false;
 		return;
 	}
 
-	frappe.db.get_value(
-		"Item",
-		row.item_code,
-		"custom_box_qty_sqm"
-	).then(r => {
-		let box_qty = flt(r.message.custom_box_qty_sqm);
+	if (!row.item_code || !row.qty) return;
 
-		if (!box_qty || box_qty <= 0) {
-			frappe.model.set_value(cdt, cdn, "box", 0);
-			return;
-		}
+	let item = await get_box_details(row);
 
-		let boxes = flt(
-			flt(row.qty) / box_qty,
-			precision("box", row)
-		);
+	if (!item.allow_box_conversion) return;
 
-		frappe.model.set_value(cdt, cdn, "box", boxes);
-	});
+	let box_qty = flt(item.custom_box_qty_sqm);
+
+	if (!box_qty) return;
+
+	let qty = flt(row.qty);
+
+	let boxes;
+
+	if (item.only_round_up_qty)
+		boxes = Math.ceil(qty / box_qty);
+
+	else if (item.only_round_down_qty)
+		boxes = Math.floor(qty / box_qty);
+
+	else
+		boxes = Math.round(qty / box_qty);
+
+	boxes = Math.max(1, boxes);
+
+	let new_qty = flt(boxes * box_qty, precision("qty", row));
+
+	// Always update box
+	row._setting_box = true;
+	await frappe.model.set_value(cdt, cdn, "box", boxes);
+
+	// Qty already correct
+	if (Math.abs(new_qty - qty) < 0.000001)
+		return;
+
+	row._setting_qty = true;
+	await frappe.model.set_value(cdt, cdn, "qty", new_qty);
 }
 
 
-function set_qty_from_box(frm, cdt, cdn) {
+async function set_box_value(frm, cdt, cdn) {
+
 	let row = locals[cdt][cdn];
 
-	if (!row.item_code || !row.box) {
+	if (row._setting_box) {
+		row._setting_box = false;
 		return;
 	}
 
-	frappe.db.get_value(
-		"Item",
-		row.item_code,
-		"custom_box_qty_sqm"
-	).then(r => {
+	if (!row.item_code) return;
 
-		let box_qty = flt(r.message.custom_box_qty_sqm);
+	let item = await get_box_details(row);
 
-		if (!box_qty) return;
+	let box_qty = flt(item.custom_box_qty_sqm);
 
-		let qty = flt(
-			flt(row.box) * box_qty,
-			precision("qty", row)
-		);
+	if (!box_qty) return;
 
-		row._updating_from_box = true;
-		frappe.model.set_value(cdt, cdn, "qty", qty);
-	});
+	let boxes = flt(row.qty / box_qty, precision("box", row));
+
+	row._setting_box = true;
+
+	await frappe.model.set_value(cdt, cdn, "box", boxes);
+}
+
+async function set_qty_from_box(frm, cdt, cdn) {
+
+	let row = locals[cdt][cdn];
+
+	if (row._setting_box) {
+		row._setting_box = false;
+		return;
+	}
+
+	if (!row.item_code) return;
+
+	let item = await get_box_details(row);
+
+	let box_qty = flt(item.custom_box_qty_sqm);
+
+	if (!box_qty) return;
+
+	let qty = flt(row.box * box_qty, precision("qty", row));
+
+	if (Math.abs(qty - row.qty) < 0.000001)
+		return;
+
+	row._setting_qty = true;
+
+	await frappe.model.set_value(cdt, cdn, "qty", qty);
 }
