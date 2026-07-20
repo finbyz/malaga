@@ -176,7 +176,8 @@ erpnext.selling.SalesOrderController = class SalesOrderController extends erpnex
 					}
 
 					if (this.frm.doc.per_picked !== 100) {
-						this.frm.add_custom_button(__('Pick List'), () => this.create_pick_list(), __('Create'));
+						this.frm.add_custom_button(
+							__('Pick List'), () => this.create_pick_list(), __('Create'));
 					}
 				}
 				this.frm.page.set_inner_btn_group_as_primary(__('Create'));
