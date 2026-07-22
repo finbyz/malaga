@@ -1,6 +1,8 @@
 frappe.ui.form.on("Quotation Item", {
 	item_code: async function (frm, cdt, cdn) {
+		await set_default_qty_from_box(frm, cdt, cdn);
 		await apply_box_qty_conversion(frm, cdt, cdn);
+		
 	},
 
 	qty : async function (frm, cdt, cdn) {
@@ -144,4 +146,27 @@ async function set_qty_from_box(frm, cdt, cdn) {
 	row._setting_qty = true;
 
 	await frappe.model.set_value(cdt, cdn, "qty", qty);
+}
+
+
+async function set_default_qty_from_box(frm, cdt, cdn) {
+	let row = locals[cdt][cdn];
+
+	if (!row.item_code) return;
+
+	let item = await get_box_details(row);
+
+	// Only proceed if box conversion is enabled on the Item
+	if (!item.allow_box_conversion) return;
+
+	let box_qty = flt(item.custom_box_qty_sqm);
+
+	if (!box_qty) return;
+
+	// Whenever item_code is selected, default: box = 1, qty = box_qty
+	row._setting_box = true;
+	await frappe.model.set_value(cdt, cdn, "box", 1);
+
+	row._setting_qty = true;
+	await frappe.model.set_value(cdt, cdn, "qty", box_qty);
 }
