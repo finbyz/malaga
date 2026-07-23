@@ -1,0 +1,100 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "GPE-.YYYY.-.#####",
+ "creation": "2026-07-22 21:14:46.203158",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "delivery__note",
+  "exist_date__time",
+  "transporter",
+  "driver_name",
+  "column_break_cuk8",
+  "driver_id",
+  "vehicle_number",
+  "shipping_address",
+  "amended_from"
+ ],
+ "fields": [
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Gate Pass Exit",
+   "print_hide": 1,
+   "read_only": 1,
+   "search_index": 1
+  },
+  {
+   "fieldname": "delivery__note",
+   "fieldtype": "Data",
+   "label": "Delivery  Note"
+  },
+  {
+   "fieldname": "exist_date__time",
+   "fieldtype": "Data",
+   "label": "Exist Date / Time"
+  },
+  {
+   "fieldname": "transporter",
+   "fieldtype": "Data",
+   "label": "Transporter"
+  },
+  {
+   "fieldname": "driver_name",
+   "fieldtype": "Data",
+   "label": "Driver Name"
+  },
+  {
+   "fieldname": "driver_id",
+   "fieldtype": "Data",
+   "label": "Driver Id"
+  },
+  {
+   "fieldname": "vehicle_number",
+   "fieldtype": "Data",
+   "label": "Vehicle Number"
+  },
+  {
+   "fieldname": "shipping_address",
+   "fieldtype": "Small Text",
+   "label": "Shipping Address"
+  },
+  {
+   "fieldname": "column_break_cuk8",
+   "fieldtype": "Column Break"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2026-07-23 13:20:09.922425",
+ "modified_by": "Administrator",
+ "module": "Malaga",
+ "name": "Gate Pass Exit",
+ "naming_rule": "Expression",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": []
+}

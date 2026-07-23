@@ -72,6 +72,7 @@ doctype_js = {
 	"Quotation": "public/js/doctype_js/quotation.js",
 	"Sales Invoice": "public/js/doctype_js/sales_invoice.js",
  	"Item": "public/js/doctype_js/item.js",
+	"Supplier": "public/js/doctype_js/supplier.js",
 }
 
 # Document Events
