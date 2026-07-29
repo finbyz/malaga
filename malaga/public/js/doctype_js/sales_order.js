@@ -31,13 +31,14 @@ erpnext.utils.update_child_items = function (opts) {
 						read_only: 0,
 						reqd: 1,
 						disabled: 0,
-						columns: 3,
+						columns: 2, 
 						label: __('Item Code'),
-						change: function () {
+						change: async function () {
 							let item_code = this.get_value();
-							if (item_code) {
-								this.grid_row.on_grid_fields_dict.rate.set_value(0);
-							}
+							if (!item_code) return;
+							this.grid_row.on_grid_fields_dict.rate.set_value(0);
+							await dlg_apply_box_qty_conversion(this.grid_row);
+							await dlg_set_default_qty_from_box(this.grid_row);
 						},
 					},
 					{
@@ -47,7 +48,22 @@ erpnext.utils.update_child_items = function (opts) {
 						read_only: 0,
 						in_list_view: 1,
 						columns: 1,
-						label: __('Qty')
+						label: __('Qty'),
+						change: async function () {
+							await dlg_apply_box_qty_conversion(this.grid_row);
+						},
+					},
+					{
+						fieldtype: 'Float',
+						fieldname: "box",
+						default: 0,
+						read_only: 0,
+						in_list_view: 1,
+						columns: 1,
+						label: __('Box'),
+						change: async function () {
+							await dlg_set_qty_from_box(this.grid_row);
+						},
 					},
 					{
 						fieldtype: 'Float',
@@ -64,6 +80,7 @@ erpnext.utils.update_child_items = function (opts) {
 						default: 0,
 						read_only: 0,
 						in_list_view: 1,
+						columns: 1.5,
 						permlevel: 1,
 						label: __('SQF Rate'),
 						change: function () {
@@ -87,6 +104,7 @@ erpnext.utils.update_child_items = function (opts) {
 						default: 0,
 						read_only: 0,
 						in_list_view: 1,
+						columns: 1.5,
 						permlevel: 2,
 						label: __('Rate')
 					},
@@ -96,6 +114,7 @@ erpnext.utils.update_child_items = function (opts) {
 						default: 0,
 						read_only: 0,
 						in_list_view: 1,
+						columns: 2,
 						permlevel: 1,
 						label: __('Discounted Rate')
 					}
@@ -129,6 +148,7 @@ erpnext.utils.update_child_items = function (opts) {
 			"name": d.name,
 			"item_code": d.item_code,
 			"qty": d.qty,
+			"box": d.box || 0,
 			"sqf_rate": d.sqf_rate,
 			"rate": d.rate,
 			"discounted_rate": d.discounted_rate,
@@ -138,8 +158,8 @@ erpnext.utils.update_child_items = function (opts) {
 		dialog.fields_dict.trans_items.grid.refresh();
 	});
 	dialog.show();
+	
 };
-
 
 erpnext.selling.SalesOrderController = class SalesOrderController extends erpnext.selling.SellingController {
 	refresh(doc, dt, dn) {
@@ -1140,4 +1160,83 @@ async function set_default_qty_from_box(frm, cdt, cdn) {
 
 	row._setting_qty = true;
 	await frappe.model.set_value(cdt, cdn, "qty", box_qty);
+}
+
+
+// ---------------------------------------------------------------------
+// Box <-> Qty conversion for the "Update Items" dialog.
+// ---------------------------------------------------------------------
+
+
+async function dlg_apply_box_qty_conversion(grid_row) {
+	const row = grid_row.doc;
+
+	if (row._setting_qty) {
+		row._setting_qty = false;
+		return;
+	}
+	if (!row.item_code || !row.qty) return;
+
+	const item = await get_box_details(row);
+	if (!item.allow_box_conversion) return;
+
+	const box_qty = flt(item.custom_box_qty_sqm);
+	if (!box_qty) return;
+
+	const qty = flt(row.qty);
+	let boxes;
+	if (item.only_round_up_qty) boxes = Math.ceil(qty / box_qty);
+	else if (item.only_round_down_qty) boxes = Math.floor(qty / box_qty);
+	else boxes = Math.round(qty / box_qty);
+	boxes = Math.max(1, boxes);
+
+	const new_qty = flt(boxes * box_qty, precision("qty", row));
+
+	row._setting_box = true;
+	await grid_row.on_grid_fields_dict.box.set_value(boxes);
+
+	if (Math.abs(new_qty - qty) < 0.000001) return;
+
+	row._setting_qty = true;
+	await grid_row.on_grid_fields_dict.qty.set_value(new_qty);
+}
+
+async function dlg_set_qty_from_box(grid_row) {
+	const row = grid_row.doc;
+
+	if (row._setting_box) {
+		row._setting_box = false;
+		return;
+	}
+	if (!row.item_code) return;
+
+	const item = await get_box_details(row);
+	const box_qty = flt(item.custom_box_qty_sqm);
+	if (!box_qty) return;
+
+	const qty = flt(row.box * box_qty, precision("qty", row));
+	if (Math.abs(qty - row.qty) < 0.000001) return;
+
+	row._setting_qty = true;
+	await grid_row.on_grid_fields_dict.qty.set_value(qty);
+}
+
+async function dlg_set_default_qty_from_box(grid_row) {
+	const row = grid_row.doc;
+	if (!row.item_code) return;
+
+	// item_code just changed -> any cached box details belong to the old item
+	delete row._box_details;
+
+	const item = await get_box_details(row);
+	if (!item.allow_box_conversion) return;
+
+	const box_qty = flt(item.custom_box_qty_sqm);
+	if (!box_qty) return;
+
+	row._setting_box = true;
+	await grid_row.on_grid_fields_dict.box.set_value(1);
+
+	row._setting_qty = true;
+	await grid_row.on_grid_fields_dict.qty.set_value(box_qty);
 }

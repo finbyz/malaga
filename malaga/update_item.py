@@ -7,6 +7,54 @@ from malaga.doc_events.pick_list import unpick_item,unpick_qty_comment
 from frappe.utils import get_url_to_form
 
 
+
+import math
+
+def get_box_conversion_details(item_code):
+	return frappe.db.get_value(
+		"Item",
+		item_code,
+		[
+			"allow_box_conversion",
+			"custom_box_qty_sqm",
+			"only_round_up_qty",
+			"only_round_down_qty",
+		],
+		as_dict=True,
+	) or {}
+
+
+def compute_box_and_qty(item_code, qty, box):
+	"""
+	Server-side mirror of the dialog's box <-> qty rounding rules.
+	Ensures the persisted box/qty pair is always consistent with the
+	Item's box settings, regardless of what the client sent.
+	"""
+	details = get_box_conversion_details(item_code)
+	box_qty = flt(details.get("custom_box_qty_sqm"))
+
+	if not details.get("allow_box_conversion") or not box_qty:
+		return flt(qty), flt(box)
+
+	qty = flt(qty)
+	box = flt(box)
+
+	if box:
+		final_box = box
+		final_qty = flt(final_box * box_qty)
+	else:
+		if details.get("only_round_up_qty"):
+			final_box = math.ceil(qty / box_qty)
+		elif details.get("only_round_down_qty"):
+			final_box = math.floor(qty / box_qty)
+		else:
+			final_box = round(qty / box_qty)
+		final_box = max(1, final_box)
+		final_qty = flt(final_box * box_qty)
+
+	return final_qty, final_box
+
+
 def set_tax_paid_on_parent(parent, tax_paid=None, tax_paid_from_si=None):
 	if not parent.meta.has_field("tax_paid"):
 		return
@@ -507,7 +555,13 @@ def update_child_qty_rate(parent_doctype, trans_items, parent_doctype_name, chil
         # if parent_doctype == "Sales Order" and flt(d.get("qty")) != flt(child_item.qty) and child_item.delivered_qty:
         # 	frappe.throw(_("Cannot change qty as delivery note is already made"))
         item_name, item_group, description,tile_quality = frappe.db.get_value("Item", d.get("item_code"), ["item_name","item_group","description","tile_quality"])
-        child_item.qty = flt(d.get("qty"))
+        # child_item.qty = flt(d.get("qty"))
+        final_qty, final_box = compute_box_and_qty(child_item.item_code, d.get("qty"), d.get("box"))
+        d["qty"] = final_qty  # keep downstream checks (billed_amt, real_qty) consistent
+        child_item.qty = final_qty
+        if child_item.meta.has_field("box"):
+            child_item.box = final_box
+            
         child_item.item_name = item_name
         child_item.item_group = item_group
         child_item.description = description or item_name

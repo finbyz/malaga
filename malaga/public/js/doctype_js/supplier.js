@@ -8,5 +8,20 @@ frappe.ui.form.on("Supplier", {
                 }
             };
         });
-    }
+    },
+    refresh(frm) {
+
+		// Driver link field
+		let df = frm.get_field("custom_driver").df;
+
+		df.get_route_options_for_new_doc = function () {
+			return {
+				transporter: frm.doc.name
+			};
+		};
+
+		frm.refresh_field("custom_driver");
+	}
+
 });
+
