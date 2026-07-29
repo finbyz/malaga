@@ -5,7 +5,7 @@ import frappe
 from frappe.model.document import Document
 
 
-class GatePassExit(Document):
+class GatePass(Document):
 
 	def on_submit(self):
 		if not self.delivery__note:
@@ -26,6 +26,7 @@ class GatePassExit(Document):
 				"driver": self.driver_id,
 				"driver_name": self.driver_name,
 				"vehicle_no": self.vehicle_number,
+				"custom_gate_pass_created":1
 				
 			},
 			update_modified=True

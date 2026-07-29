@@ -22,15 +22,16 @@
    "fieldtype": "Link",
    "label": "Amended From",
    "no_copy": 1,
-   "options": "Gate Pass Exit",
+   "options": "Gate Pass",
    "print_hide": 1,
    "read_only": 1,
    "search_index": 1
   },
   {
    "fieldname": "delivery__note",
-   "fieldtype": "Data",
-   "label": "Delivery  Note"
+   "fieldtype": "Link",
+   "label": "Delivery  Note",
+   "options": "Delivery Note"
   },
   {
    "fieldname": "exist_date__time",
@@ -39,8 +40,9 @@
   },
   {
    "fieldname": "transporter",
-   "fieldtype": "Data",
-   "label": "Transporter"
+   "fieldtype": "Link",
+   "label": "Transporter",
+   "options": "Supplier"
   },
   {
    "fieldname": "driver_name",
@@ -71,10 +73,10 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-07-23 13:20:09.922425",
+ "modified": "2026-07-28 20:31:50.759527",
  "modified_by": "Administrator",
  "module": "Malaga",
- "name": "Gate Pass Exit",
+ "name": "Gate Pass",
  "naming_rule": "Expression",
  "owner": "Administrator",
  "permissions": [

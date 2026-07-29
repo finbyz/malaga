@@ -13,9 +13,9 @@ IGNORE_TEST_RECORD_DEPENDENCIES = []  # eg. ["User"]
 
 
 
-class IntegrationTestGatePassExit(IntegrationTestCase):
+class IntegrationTestGatePass(IntegrationTestCase):
 	"""
-	Integration tests for GatePassExit.
+	Integration tests for GatePass.
 	Use this class for testing interactions between multiple components.
 	"""
 
