@@ -1,0 +1,13 @@
+{
+ "creation": "2026-08-04 15:34:14.811621",
+ "docstatus": 0,
+ "doctype": "Dashboard Chart Source",
+ "idx": 0,
+ "modified": "2026-08-04 15:34:14.811621",
+ "modified_by": "Administrator",
+ "module": "Malaga",
+ "name": "Cash and Bank Balance",
+ "owner": "Administrator",
+ "source_name": "Cash and Bank Balance",
+ "timeseries": 0
+}

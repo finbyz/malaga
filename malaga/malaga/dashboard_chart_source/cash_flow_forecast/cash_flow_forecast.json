@@ -1,0 +1,13 @@
+{
+ "creation": "2026-08-04 16:42:53.583183",
+ "docstatus": 0,
+ "doctype": "Dashboard Chart Source",
+ "idx": 0,
+ "modified": "2026-08-04 16:42:53.583183",
+ "modified_by": "Administrator",
+ "module": "Malaga",
+ "name": "Cash Flow Forecast",
+ "owner": "Administrator",
+ "source_name": "Cash Flow Forecast",
+ "timeseries": 0
+}
