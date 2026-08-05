@@ -121,8 +121,60 @@ def open_sales_orders(filters=None):
 			"per_delivered": ["<", 100],
 		},
 	)
+ 
+@frappe.whitelist()
+def open_sales_invoices(filters=None):
+    company = _company(filters)
+
+    return frappe.db.count(
+        "Sales Invoice",
+        {
+            "company": company,
+            "docstatus": 1,
+            "outstanding_amount": [">", 0],
+            "status": ["not in", ["Cancelled", "Paid"]],
+        },
+    )
 
 
+@frappe.whitelist()
+def overdue_sales_invoices(filters=None):
+    company = _company(filters)
+
+    return frappe.db.count(
+        "Sales Invoice",
+        {
+            "company": company,
+            "docstatus": 1,
+            "status": "Overdue",
+        },
+    )
+    
+@frappe.whitelist()
+def draft_delivery_notes(filters=None):
+    company = _company(filters)
+
+    return frappe.db.count(
+        "Delivery Note",
+        {
+            "company": company,
+            "docstatus": 0,
+            
+        },
+    )
+
+@frappe.whitelist()
+def delivery_note_without_gate_pass(filters=None):
+    company = _company(filters)
+
+    return frappe.db.count(
+        "Delivery Note",
+        {
+            "company": company,
+            "docstatus": 1,
+            "custom_gate_pass_created": 0,
+        },
+    )
 @frappe.whitelist()
 def open_purchase_orders(filters=None):
 	company = _company(filters)
@@ -136,7 +188,31 @@ def open_purchase_orders(filters=None):
 		},
 	)
 
+@frappe.whitelist()
+def open_purchase_invoices(filters=None):
+    company = _company(filters)
 
+    return frappe.db.count(
+        "Purchase Invoice",
+        {
+            "company": company,
+            "docstatus": 0,
+            "outstanding_amount": [">", 0],
+        },
+    )
+
+@frappe.whitelist()
+def overdue_purchase_invoices(filters=None):
+    company = _company(filters)
+
+    return frappe.db.count(
+        "Purchase Invoice",
+        {
+            "company": company,
+            "docstatus": 1,
+            "status": "Overdue",
+        },
+    )
 def _commission_earned(company, from_date, to_date, exclude_internal=True):
 	internal_condition = " AND IFNULL(invoice.is_internal_customer, 0) = 0" if exclude_internal else ""
 	return frappe.db.sql(
@@ -169,6 +245,38 @@ def profit_after_commission_this_month(filters=None):
 	return _currency_result(value, company)
 
 
+def monthly_purchase_revenue_data(filters=None):
+	company = _company(filters)
+	internal_condition = _purchase_internal_sql("pi", filters)
+	current_year = getdate(nowdate()).year
+	rows = frappe.db.sql(
+		f"""
+		SELECT YEAR(posting_date) AS year, MONTH(posting_date) AS month, SUM(base_net_total) AS revenue
+		FROM `tabPurchase Invoice` pi
+		WHERE docstatus = 1 AND company = %s AND YEAR(posting_date) IN (%s, %s)
+		{internal_condition}
+		GROUP BY YEAR(posting_date), MONTH(posting_date)
+		""",
+		(company, current_year, current_year - 1),
+		as_dict=True,
+	)
+	values = {(row.year, row.month): row.revenue for row in rows}
+	current_month = getdate(nowdate()).month
+	return {
+		"labels": [calendar.month_abbr[month] for month in range(1, 13)],
+		"datasets": [
+			{
+				"name": str(current_year),
+				"values": [values.get((current_year, month), 0) if month <= current_month else None for month in range(1, 13)],
+			},
+			{
+				"name": str(current_year - 1),
+				"values": [values.get((current_year - 1, month), 0) for month in range(1, 13)],
+			},
+		],
+		"type": "bar",
+	}
+ 
 def monthly_sales_revenue_data(filters=None):
 	company = _company(filters)
 	internal_condition = _sales_internal_sql("si", filters)

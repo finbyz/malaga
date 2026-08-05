@@ -1,27 +1,29 @@
 {
  "cards": [
   {
+   "card": "Gross Profit This Month"
+  },
+  {
    "card": "Open Purchase Orders"
   },
   {
-   "card": "Gross Profit This Month"
+   "card": "Open Purchase Invoices"
+  },
+  {
+   "card": "Overdue Purchase Invoices"
   }
  ],
  "charts": [
+  {
+   "chart": "Monthly Purchase Revenue Comparison",
+   "width": "Half"
+  },
   {
    "chart": "Malaga Profit and Loss",
    "width": "Half"
   },
   {
-   "chart": "Cash and Bank Balance",
-   "width": "Half"
-  },
-  {
    "chart": "Cash Flow Forecast",
-   "width": "Half"
-  },
-  {
-   "chart": "Malaga Accounts Receivable Ageing",
    "width": "Half"
   },
   {
@@ -48,7 +50,7 @@
  "idx": 0,
  "is_default": 0,
  "is_standard": 1,
- "modified": "2026-08-05 12:10:04.013565",
+ "modified": "2026-08-05 16:02:40.766985",
  "modified_by": "Administrator",
  "module": "Malaga",
  "name": "Purchase Dashboard",

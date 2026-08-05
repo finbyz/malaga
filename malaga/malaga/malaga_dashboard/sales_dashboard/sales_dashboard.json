@@ -5,6 +5,18 @@
   },
   {
    "card": "Open Sales Orders"
+  },
+  {
+   "card": "Open Sales Invoices"
+  },
+  {
+   "card": "Overdue Sales Invoices"
+  },
+  {
+   "card": "Draft Delivery Note"
+  },
+  {
+   "card": "Delivery Notes Without Gate Pass"
   }
  ],
  "charts": [
@@ -32,7 +44,7 @@
  "idx": 0,
  "is_default": 0,
  "is_standard": 1,
- "modified": "2026-08-05 12:09:06.230817",
+ "modified": "2026-08-05 15:13:35.434505",
  "modified_by": "Administrator",
  "module": "Malaga",
  "name": "Sales Dashboard",
