@@ -660,14 +660,14 @@ frappe.ui.form.on('Sales Order', {
 		}
 
 		// Remove default Delivery Note button and add custom one
-		setTimeout(() => {
-			frm.remove_custom_button('Delivery Note', 'Create');
-		}, 10);
+		// setTimeout(() => {
+		// 	frm.remove_custom_button('Delivery Note', 'Create');
+		// }, 10);
 
 
-		if (frm.doc.status !== 'Closed' && frm.doc.status !== 'On Hold') {
-			frm.add_custom_button(__('Delivery Note '), () => make_delivery_note_based_on_delivery_date(frm), __('Create'));
-		}
+		// if (frm.doc.status !== 'Closed' && frm.doc.status !== 'On Hold') {
+		// 	frm.add_custom_button(__('Delivery Note '), () => make_delivery_note_based_on_delivery_date(frm), __('Create'));
+		// }
 
 	},
 

@@ -5,6 +5,14 @@
 
 frappe.ui.form.on("Delivery Note", {
 	onload(frm) {
+
+		if (frm.doc.__islocal) {
+			frm.doc.items.forEach(function (row) {
+				if (row.item_code && !row.batch_no) {
+					set_latest_batch(frm, row.doctype, row.name, row.item_code);
+				}
+			});
+		}
 		// --- Item Code filter (merged from old get_query and set_query) ---
 		frm.set_query("item_code", "items", function (doc, cdt, cdn) {
 			let filters = [["is_sales_item", "=", 1]];
@@ -670,6 +678,10 @@ frappe.ui.form.on("Delivery Note Item", {
 	},
 
 	item_code: async function (frm, cdt, cdn) {
+		let row = locals[cdt][cdn];
+		if (row.item_code) {
+			set_latest_batch(frm, cdt, cdn, row.item_code);
+		}
 		await set_default_qty_from_box(frm, cdt, cdn);
 		await apply_box_qty_conversion(frm, cdt, cdn);
 	},
@@ -817,4 +829,22 @@ async function set_default_qty_from_box(frm, cdt, cdn) {
 
 	row._setting_qty = true;
 	await frappe.model.set_value(cdt, cdn, "qty", box_qty);
+}
+
+
+function set_latest_batch(frm, cdt, cdn, item_code) {
+	frappe.db.get_value("Item", item_code, "has_batch_no", (r) => {
+		if (!r || !r.has_batch_no) return; // skip items that aren't batch-tracked
+
+		frappe.db.get_list("Batch", {
+			filters: { item: item_code, disabled: 0 },
+			fields: ["name"],
+			order_by: "creation desc",
+			limit: 1
+		}).then((batches) => {
+			if (batches && batches.length) {
+				frappe.model.set_value(cdt, cdn, "batch_no", batches[0].name);
+			}
+		});
+	});
 }
