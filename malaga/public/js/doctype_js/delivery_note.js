@@ -837,7 +837,15 @@ function set_latest_batch(frm, cdt, cdn, item_code) {
 		if (!r || !r.has_batch_no) return; // skip items that aren't batch-tracked
 
 		frappe.db.get_list("Batch", {
-			filters: { item: item_code, disabled: 0 },
+			filters: {
+				item: item_code,
+				"disabled": 0,
+				batch_qty: [">", 0]
+			},
+			or_filters: [
+				["expiry_date", "is", "not set"],
+				["expiry_date", ">=", frappe.datetime.get_today()]
+			],
 			fields: ["name"],
 			order_by: "creation desc",
 			limit: 1

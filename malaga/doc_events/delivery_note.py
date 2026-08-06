@@ -149,8 +149,8 @@ def check_item_without_pick(self):
 		
 		allowed_qty = so_qty - so_picked_qty - so_delivered_without_pick
 		
-		if allowed_qty < row:
-			frappe.throw(f"You can not deliver more than {allowed_qty} without Pick List for Item {item_code} for Sales Order {parent}.")
+		# if allowed_qty < row:
+		# 	frappe.throw(f"You can not deliver more than {allowed_qty} without Pick List for Item {item_code} for Sales Order {parent}.")
 
 def update_status_pick_list_and_sales_order(self):
 	for item in self.items:
