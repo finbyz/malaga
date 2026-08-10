@@ -1,0 +1,32 @@
+{
+ "custom_fields": [],
+ "custom_perms": [],
+ "doctype": "Payment Schedule",
+ "links": [],
+ "property_setters": [
+  {
+   "_assign": null,
+   "_comments": null,
+   "_liked_by": null,
+   "_user_tags": null,
+   "creation": "2026-08-05 16:38:43.066543",
+   "default_value": null,
+   "doc_type": "Payment Schedule",
+   "docstatus": 0,
+   "doctype_or_field": "DocField",
+   "field_name": "due_date",
+   "idx": 0,
+   "is_system_generated": 0,
+   "modified": "2026-06-23 13:17:28.612349",
+   "modified_by": "Administrator",
+   "module": "Malaga",
+   "name": "Payment Schedule-due_date-default",
+   "owner": "Administrator",
+   "property": "default",
+   "property_type": "Text",
+   "row_name": null,
+   "value": ""
+  }
+ ],
+ "sync_on_migrate": 1
+}
