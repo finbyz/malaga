@@ -724,15 +724,16 @@ frappe.ui.form.on('Sales Order', {
 			frappe.db.get_value("Customer", frm.doc.customer, 'primary_customer').then(function (r) {
 				frm.set_value("primary_customer", r.message.primary_customer);
 			});
-			frappe.db.get_value("Customer", frm.doc.customer, 'sales_head').then(function (r) {
-				frm.set_value("sales_head", r.message.sales_head);
-			});
-			frappe.db.get_value("Customer", frm.doc.customer, 'dispatch_person').then(function (r) {
-				frm.set_value("dispatch_person", r.message.dispatch_person);
-			});
-			frappe.db.get_value("Customer", frm.doc.customer, 'sales_representative').then(function (r) {
-				frm.set_value("regional_sales_manager", r.message.sales_representative);
-			});
+			// buggy code, commented out for now
+			// frappe.db.get_value("Customer", frm.doc.customer, 'sales_head').then(function (r) {
+			// 	frm.set_value("sales_head", r.message.sales_head);
+			// });
+			// frappe.db.get_value("Customer", frm.doc.customer, 'dispatch_person').then(function (r) {
+			// 	frm.set_value("dispatch_person", r.message.dispatch_person);
+			// });
+			// frappe.db.get_value("Customer", frm.doc.customer, 'sales_representative').then(function (r) {
+			// 	frm.set_value("regional_sales_manager", r.message.sales_representative);
+			// });
 		}
 	},
 
