@@ -131,6 +131,9 @@ scheduler_events = {
 	"daily": [
 		"malaga.doc_events.sales_order.schedule_daily",
 	],
+	"cron": {
+		"00 */12 * * *": "malaga.shopify_refresh_token.update_shopify_token"
+	},
 }
 
 fixtures = [
