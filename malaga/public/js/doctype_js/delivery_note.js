@@ -91,7 +91,7 @@ frappe.ui.form.on("Delivery Note", {
 
 
 		// Ignore doctypes on cancel
-		frm.ignore_doctypes_on_cancel_all = ["Sales Invoice"];
+		// frm.ignore_doctypes_on_cancel_all = ["Sales Invoice"];
 
 
 
