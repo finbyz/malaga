@@ -184,10 +184,10 @@ frappe.ui.form.on("Delivery Note", {
 		}
 
 		if (frm.doc.docstatus == 1) {
-			frm.show_stock_ledger();
-			if (erpnext.is_perpetual_inventory_enabled(frm.doc.company)) {
-				frm.show_general_ledger();
-			}
+			// frm.show_stock_ledger();
+			// if (erpnext.is_perpetual_inventory_enabled(frm.doc.company)) {
+			// 	frm.show_general_ledger();
+			// }
 			if (frm.has_perm("submit") && frm.doc.status !== "Closed") {
 				frm.add_custom_button(__("Close"), function () { frm.close_delivery_note(); }, __("Status"));
 			}
@@ -619,7 +619,7 @@ frappe.ui.form.on("Delivery Note", {
 
 // Delivery Note Item events (unchanged except using frm parameter)
 frappe.ui.form.on("Delivery Note Item", {
-	qty : async function (frm, cdt, cdn) {
+	qty: async function (frm, cdt, cdn) {
 		let d = locals[cdt][cdn];
 		frm.events.calculate_total(frm);
 		if (d.uom != d.stock_uom) {
@@ -636,17 +636,17 @@ frappe.ui.form.on("Delivery Note Item", {
 		await apply_box_qty_conversion(frm, cdt, cdn);
 	},
 
-	box: async function(frm, cdt, cdn) {
-			let row = locals[cdt][cdn];
+	box: async function (frm, cdt, cdn) {
+		let row = locals[cdt][cdn];
 
 		if (row._setting_box) {
 			row._setting_box = false;
 			return;
 		}
-			await set_qty_from_box(frm, cdt, cdn);
+		await set_qty_from_box(frm, cdt, cdn);
 	},
 
-	
+
 	sqf_rate(frm, cdt, cdn) {
 		let d = locals[cdt][cdn];
 		if (d.sqf_rate) {
