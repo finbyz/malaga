@@ -115,16 +115,18 @@ def get_previous_date_range(from_date, to_date):
     return prev_from, prev_to
 
 def fmt_inr(value):
-    """Format a number as Indian Cr / L currency string."""
+    """Format a number as a compact $ K/M/B currency string."""
     value = value or 0
     abs_value = abs(value)
-    if abs_value >= 1e7:
-        return "₹ {:.2f} Cr".format(value / 1e7)
-    if abs_value >= 1e5:
-        return "₹ {:.2f} L".format(value / 1e5)
-    return "₹ {:,.0f}".format(value)
+    if abs_value >= 1e9:
+        return "$ {:.2f}B".format(value / 1e9)
+    if abs_value >= 1e6:
+        return "$ {:.2f}M".format(value / 1e6)
+    if abs_value >= 1e3:
+        return "$ {:.2f}K".format(value / 1e3)
+    return "$ {:,.0f}".format(value)
 
-def fmt_money(value, symbol="₹"):
+def fmt_money(value, symbol="$"):
     """Format a number as a compact K/M/B currency string with the given symbol."""
     value = value or 0
     abs_value = abs(value)
@@ -138,20 +140,19 @@ def fmt_money(value, symbol="₹"):
 
 
 def fmt_inr_full(value):
-    """Format a number as a full INR currency string without K/M/Cr abbreviations."""
+    """Format a number as a full currency string without K/M/Cr abbreviations."""
     value = value or 0
     if float(value).is_integer():
-        return "₹ {:,}".format(int(round(value)))
-    return "₹ {:,.2f}".format(value)
+        return "$ {:,}".format(int(round(value)))
+    return "$ {:,.2f}".format(value)
 
 
-def fmt_money_full(value, symbol="₹"):
+def fmt_money_full(value, symbol="$"):
     """Format a number as a full currency string without K/M/B abbreviations."""
     value = value or 0
     if float(value).is_integer():
         return "{0} {1:,}".format(symbol, int(round(value)))
     return "{0} {1:,.2f}".format(symbol, value)
-
 # ============================================================
 # CARD 1: TOTAL SALES (DYNAMIC)
 # ============================================================

@@ -867,16 +867,19 @@ frappe.pages["executive-dashboard"].on_page_load = function (wrapper) {
     }
 
     function formatCompactInr(value) {
-        const amount = value || 0;
-        const absValue = Math.abs(amount);
-        if (absValue >= 1e7) {
-            return `₹ ${Number(amount / 1e7).toFixed(2)} Cr`;
-        }
-        if (absValue >= 1e5) {
-            return `₹ ${Number(amount / 1e5).toFixed(2)} L`;
-        }
-        return `₹ ${Number(amount).toLocaleString('en-IN', { maximumFractionDigits: 0 })}`;
-    }
+		const amount = value || 0;
+		const absValue = Math.abs(amount);
+		if (absValue >= 1e9) {
+			return `$ ${Number(amount / 1e9).toFixed(2)}B`;
+		}
+		if (absValue >= 1e6) {
+			return `$ ${Number(amount / 1e6).toFixed(2)}M`;
+		}
+		if (absValue >= 1e3) {
+			return `$ ${Number(amount / 1e3).toFixed(2)}K`;
+		}
+		return `$ ${Number(amount).toLocaleString('en-US', { maximumFractionDigits: 0 })}`;
+	}
 
     // Compact Item Group <select>, styled and sized to match the Qty
     // Wise/Amount Wise selector exactly, so both controls sit side by side
